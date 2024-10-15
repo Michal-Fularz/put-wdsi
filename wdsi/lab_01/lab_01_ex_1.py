@@ -16,7 +16,7 @@ def create_graph() -> dict[int, list[int]]:
     return graph
 
 
-def bfs(s, g, graph: dict):
+def bfs(s: int, g: int, graph: dict[int, list[int]]) -> list[int]:
     # s - wierzchołek startowy
     # g - wierzchołek docelowy
     # nodes - lista wierzchołków
@@ -71,8 +71,7 @@ def bfs(s, g, graph: dict):
         cur_n = parent[cur_n]
     # wierzchołki są w odwrotnej kolejności, więc odwracamy listę
     # reverse(path)
-    path = list(reversed(path))
-
+    path.reverse()
     return path
 
 
@@ -80,3 +79,7 @@ def ex_1():
     graph = create_graph()
     path = bfs(1, 4, graph)
     print(path)
+
+
+if __name__ == '__main__':
+    ex_1()
