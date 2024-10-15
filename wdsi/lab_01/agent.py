@@ -1,11 +1,9 @@
-# prob.py
-# This is
-
 import random
-import numpy as np
 import queue
 
-from gridutil import *
+import numpy as np
+
+from gridutil import locations
 
 
 class Agent:

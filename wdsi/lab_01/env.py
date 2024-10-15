@@ -1,9 +1,9 @@
 from graphics import *
-from gridutil import *
+from gridutil import locations, nextLoc
 
 
 class LocWorldEnv:
-    actions = "turnleft turnright forward".split()
+    actions = 'turnleft turnright forward'.split()
 
     def __init__(self, size, walls, start_loc, goal_loc):
         self.size = size
@@ -38,12 +38,12 @@ class LocView:
     Points = {'N': (0, -Size, 0, Size), 'E': (-Size, 0, Size, 0),
               'S': (0, Size, 0, -Size), 'W': (Size, 0, -Size, 0)}
 
-    color = "black"
+    color = 'black'
 
-    def __init__(self, state, height=800, title="Loc World"):
+    def __init__(self, state, height=800, title='Loc World'):
         xySize = state.size
         win = self.win = GraphWin(title, 1.33 * height, height, autoflush=False)
-        win.setBackground("gray99")
+        win.setBackground('gray99')
         win.setCoords(-.5, -.5, 1.33 * xySize - .5, xySize - .5)
         cells = self.cells = {}
         for x in range(xySize):
@@ -55,25 +55,19 @@ class LocView:
         self.arrow = None
         self.path_prim = []
         ccenter = 1.167 * (xySize - .5)
-        # self.time = Text(Point(ccenter, (xySize - 1) * .75), "Time").draw(win)
-        # self.time.setSize(36)
-        # self.setTimeColor("black")
 
-        self.agentName = Text(Point(ccenter, (xySize - 1) * .5), "").draw(win)
+        self.agentName = Text(Point(ccenter, (xySize - 1) * .5), '').draw(win)
         self.agentName.setSize(20)
-        self.agentName.setFill("Orange")
+        self.agentName.setFill('Orange')
 
-        self.info = Text(Point(ccenter, (xySize - 1) * .25), "").draw(win)
+        self.info = Text(Point(ccenter, (xySize - 1) * .25), '').draw(win)
         self.info.setSize(20)
-        self.info.setFace("courier")
+        self.info.setFace('courier')
 
         self.update(state, [])
 
     def setAgent(self, name):
         self.agentName.setText(name)
-
-    # def setTime(self, seconds):
-    #     self.time.setText(str(seconds))
 
     def setInfo(self, info):
         self.info.setText(info)
@@ -82,11 +76,11 @@ class LocView:
         # View state in exiting window
         for loc, cell in self.cells.items():
             if loc in state.walls:
-                cell.setFill("black")
+                cell.setFill('black')
             elif loc == state.goal_loc:
-                cell.setFill("yellow")
+                cell.setFill('yellow')
             else:
-                cell.setFill("white")
+                cell.setFill('white')
 
         for prim in self.path_prim:
             prim.undraw()
@@ -105,7 +99,7 @@ class LocView:
         x, y = loc
         a = Circle(Point(x, y), .1)
         a.setWidth(1)
-        a.setFill("blue")
+        a.setFill('blue')
         a.draw(self.win)
         return a
 
@@ -116,7 +110,7 @@ class LocView:
         p2 = Point(x2, y2)
         a = Line(p1, p2)
         a.setWidth(2)
-        a.setFill("blue")
+        a.setFill('blue')
         a.draw(self.win)
         return a
 
@@ -134,9 +128,6 @@ class LocView:
 
     def pause(self):
         self.win.getMouse()
-
-    # def setTimeColor(self, c):
-    #     self.time.setTextColor(c)
 
     def close(self):
         self.win.close()

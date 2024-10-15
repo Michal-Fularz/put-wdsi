@@ -6,14 +6,14 @@ import random
 import numpy as np
 
 from graphics import *
-from gridutil import *
-from agent import *
-from env import *
+from gridutil import locations
+from agent import Agent
+from env import LocWorldEnv, LocView
 
 
 def main():
     # comment to get different scenarios
-    # random.seed(13)
+    random.seed(13)
     # rate of executing actions
     rate = 1
     # size of the environment
