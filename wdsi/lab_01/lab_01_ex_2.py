@@ -13,7 +13,7 @@ from env import LocWorldEnv, LocView
 
 def main():
     # comment to get different scenarios
-    random.seed(13)
+    # random.seed(13)
     # rate of executing actions
     rate = 1
     # size of the environment
@@ -54,9 +54,9 @@ def main():
     view = LocView(env)
 
     # create the agent
-    agent = Agent(env.size, env.walls, env.agentLoc, env.agentDir, goal)
+    agent = Agent(env.size, env.walls, env.agent_loc, env.agent_dir, goal)
     t = 0
-    while env.agentLoc != goal:
+    while env.agent_loc != goal:
         print('step %d' % t)
 
         # get agent's path
@@ -71,7 +71,7 @@ def main():
         # uncomment to pause before action
         view.pause()
 
-        env.doAction(action)
+        env.do_action(action)
 
         t += 1
 
