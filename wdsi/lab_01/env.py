@@ -1,5 +1,5 @@
 from graphics import *
-from gridutil import locations, nextLoc
+from gridutil import generate_locations, next_loc
 
 
 class LocWorldEnv:
@@ -9,7 +9,7 @@ class LocWorldEnv:
         self.size = size
         self.walls = walls
         self.action_sensors = []
-        self.locations = {*locations(self.size)}.difference(self.walls)
+        self.locations = {*generate_locations(self.size)}.difference(self.walls)
         self.start_loc = start_loc
         self.goal_loc = goal_loc
         self.lifes = 3
@@ -23,7 +23,7 @@ class LocWorldEnv:
     def doAction(self, action):
         points = -1
 
-        loc = nextLoc(self.agentLoc, action)
+        loc = next_loc(self.agentLoc, action)
         if loc in self.locations:
             self.agentLoc = loc
 

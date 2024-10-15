@@ -6,7 +6,7 @@ import random
 import numpy as np
 
 from graphics import *
-from gridutil import locations
+from gridutil import generate_locations
 from agent import Agent
 from env import LocWorldEnv, LocView
 
@@ -43,7 +43,7 @@ def main():
                 walls.append((j, env_size - i - 1))
 
     # list of valid locations
-    locs = list({*locations(env_size)}.difference(walls))
+    locs = list({*generate_locations(env_size)}.difference(walls))
     # start and goal location
     start_goal = random.sample(locs, k=2)
     start = start_goal[0]

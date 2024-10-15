@@ -3,7 +3,7 @@ import queue
 
 import numpy as np
 
-from gridutil import locations
+from gridutil import generate_locations
 
 
 class Agent:
@@ -11,7 +11,7 @@ class Agent:
         self.size = size
         self.walls = walls
         # list of valid locations
-        self.locations = list({*locations(self.size)}.difference(self.walls))
+        self.locations = list({*generate_locations(self.size)}.difference(self.walls))
         # dictionary from location to its index in the list
         self.loc_to_idx = {loc: idx for idx, loc in enumerate(self.locations)}
         self.loc = loc
