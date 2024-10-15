@@ -1,7 +1,7 @@
 # gridutil.py
 #  Some useful functions for navigating square 2d grids
 
-DIRECTIONS = "NESW"
+DIRECTIONS = 'NESW'
 ORIENTATIONS = {
     'N': (0, 1),
     'E': (1, 0),
@@ -39,11 +39,11 @@ def generate_locations(n: int):
             yield x, y
 
 
-def manhat_dist(loc1: tuple[int, int], loc2: tuple[int, int]) -> int:
+def manhattan_dist(loc1: tuple[int, int], loc2: tuple[int, int]) -> int:
     x1, y1 = loc1
     x2, y2 = loc2
     return abs(x1-x2) + abs(y1-y2)
 
 
 def adjacent(loc1: tuple[int, int], loc2: tuple[int, int]) -> bool:
-    return manhat_dist(loc1, loc2) == 1
+    return manhattan_dist(loc1, loc2) == 1
