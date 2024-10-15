@@ -69,6 +69,7 @@ def bfs(s: int, g: int, graph: dict[int, list[int]]) -> list[int]:
         # add(path, cur_n)
         path.append(cur_n)
         cur_n = parent[cur_n]
+    path.append(s)
     # wierzchołki są w odwrotnej kolejności, więc odwracamy listę
     # reverse(path)
     path.reverse()
@@ -79,6 +80,12 @@ def ex_1():
     graph = create_graph()
     path = bfs(1, 4, graph)
     print(path)
+
+    assert bfs(1, 4, graph) == [1, 3, 4]
+    assert bfs(1, 8, graph) == [1, 2, 5, 8]
+    assert bfs(3, 5, graph) == [3, 1, 2, 5]
+    # despite the length being the same does not work, as bfs returns first shortest path
+    # assert bfs(3, 5, graph) == [3, 4, 6, 5]
 
 
 if __name__ == '__main__':
