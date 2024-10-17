@@ -41,26 +41,26 @@ class LocView:
     color = 'black'
 
     def __init__(self, state, height=800, title='Loc World'):
-        xySize = state.size
+        xy_size = state.size
         win = self.win = GraphWin(title, 1.33 * height, height, autoflush=False)
         win.setBackground('gray99')
-        win.setCoords(-.5, -.5, 1.33 * xySize - .5, xySize - .5)
+        win.setCoords(-.5, -.5, 1.33 * xy_size - .5, xy_size - .5)
         cells = self.cells = {}
-        for x in range(xySize):
-            for y in range(xySize):
+        for x in range(xy_size):
+            for y in range(xy_size):
                 cells[(x, y)] = Rectangle(Point(x - .5, y - .5), Point(x + .5, y + .5))
                 cells[(x, y)].setWidth(2)
                 cells[(x, y)].draw(win)
         self.agt = None
         self.arrow = None
         self.path_prim = []
-        center = 1.167 * (xySize - .5)
+        center = 1.167 * (xy_size - .5)
 
-        self.agentName = Text(Point(center, (xySize - 1) * .5), '').draw(win)
+        self.agentName = Text(Point(center, (xy_size - 1) * .5), '').draw(win)
         self.agentName.setSize(20)
         self.agentName.setFill('Orange')
 
-        self.info = Text(Point(center, (xySize - 1) * .25), '').draw(win)
+        self.info = Text(Point(center, (xy_size - 1) * .25), '').draw(win)
         self.info.setSize(20)
         self.info.setFace('courier')
 
