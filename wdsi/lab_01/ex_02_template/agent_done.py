@@ -1,8 +1,3 @@
-import random
-import queue
-
-import numpy as np
-
 from gridutil import generate_locations
 from wdsi.lab_01.lab_01_ex_01 import bfs
 
@@ -46,9 +41,7 @@ class Agent:
             graph
         )
         idx_to_loc = {idx: loc for idx, loc in enumerate(self.locations)}
-        for e in path_idx:
-            path.append(idx_to_loc[e])
-
+        path = [idx_to_loc[item] for item in path_idx]
         # ------------------
 
         return path
@@ -60,11 +53,13 @@ class Agent:
         graph_locations = create_adjacency_list(self.locations)
 
         graph = {}
-        for key, value in graph_locations.items():
+        for key, vertices in graph_locations.items():
             adjacent_vertices = []
-            for v in value:
+            for v in vertices:
                 adjacent_vertices.append(self.loc_to_idx[v])
             graph[self.loc_to_idx[key]] = adjacent_vertices
+
+            # graph[self.loc_to_idx[key]] = [self.loc_to_idx[vertex] for vertex in vertices]
 
         return graph
 
