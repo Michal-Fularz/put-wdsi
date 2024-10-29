@@ -6,9 +6,9 @@ import random
 import numpy as np
 
 from graphics import *
-from gridutil import *
-from agent import *
-from env import *
+from gridutil import generate_locations
+from agent import Agent
+from env import LocWorldEnv, LocView
 
 
 def main():
@@ -43,7 +43,7 @@ def main():
                 walls.append((j, env_size - i - 1))
 
     # list of valid locations
-    locs = list({*locations(env_size)}.difference(walls))
+    locs = list({*generate_locations(env_size)}.difference(walls))
     # start and goal location
     start_goal = random.sample(locs, k=2)
     start = start_goal[0]
@@ -54,9 +54,9 @@ def main():
     view = LocView(env)
 
     # create the agent
-    agent = Agent(env.size, env.walls, env.agentLoc, env.agentDir, goal)
+    agent = Agent(env.size, env.walls, env.agent_loc, env.agent_dir, goal)
     t = 0.0
-    while env.agentLoc != goal:
+    while env.agent_loc != goal:
         print('elapsed time %f' % -t)
 
         # get agent's path
@@ -71,7 +71,7 @@ def main():
         # uncomment to pause before action
         view.pause()
 
-        action_cost = env.doAction(action)
+        action_cost = env.do_action(action)
 
         t += action_cost
 
