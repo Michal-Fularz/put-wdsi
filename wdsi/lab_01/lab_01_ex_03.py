@@ -49,6 +49,8 @@ def dijkstra(s: int, g: int, graph: dict[int, list[(int, int)]]) -> list[int]:
         # przerwij jeśli odwiedzony
         if cur_n in visited:
             continue
+        # dodaj wierzchołek do listy odwiedonych
+        visited.add(cur_n)
 
         # przerwij jeśli dotarliśmy do celu
         if cur_n == g:
