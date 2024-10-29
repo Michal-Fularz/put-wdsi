@@ -52,20 +52,22 @@ def main():
              (8, 8): [(5, 10), (10, 10)],
              (9, 4): [(5, 5), (8, 7), (10, 7)],
              (10, 7): [(9, 4), (10, 10), (12, 5)],
-             (10, 10): [(5, 10), (8, 8), (12, 9)],
+             (10, 10): [(5, 10), (8, 8), (10, 7), (12, 9)],
              (12, 5): [(10, 7), (12, 7)],
              (12, 7): [(12, 5), (12, 9), (15, 8)],
              (12, 9): [(10, 10), (12, 7), (14, 10)],
              (14, 4): [(15, 8)],
              (14, 10): [(12, 9), (15, 8)],
-             (15, 8): [(14, 4), (14, 10)]}
+             (15, 8): [(12, 7), (14, 4), (14, 10)]}
 
     # list of valid locations
     locs = list(graph.keys())
     # start and goal location
     start_goal = random.sample(locs, k=2)
-    start = start_goal[0]
-    goal = start_goal[1]
+    # start = start_goal[0]
+    start = (8, 8)
+    # goal = start_goal[1]
+    goal = (8, 7)
 
     # create the environment and viewer
     env = LocWorldEnv(env_size, walls, graph, start, goal)
