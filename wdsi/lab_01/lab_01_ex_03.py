@@ -17,7 +17,7 @@ def create_graph() -> dict[int, list[(int, int)]]:
     return graph
 
 
-def bfs(s: int, g: int, graph: dict[int, list[(int, int)]]) -> list[int]:
+def dijkstra(s: int, g: int, graph: dict[int, list[(int, int)]]) -> list[int]:
     # s - wierzchołek startowy
     # g - wierzchołek docelowy
     # nodes - lista wierzchołków
@@ -74,15 +74,6 @@ def bfs(s: int, g: int, graph: dict[int, list[(int, int)]]) -> list[int]:
                 # push(q, (new_cost, nh))
                 q.put((new_cost, nh))
 
-            #     # jeśli sąsiad nie był jeszcze odwiedzony
-            # if nh not in visited:
-            #     # oznacz jako odwiedzony i dodaj do kolejki
-            #     parent[nh] = cur_n
-            #     # add(visited, nh)
-            #     visited.add(nh)
-            #     # push(q, nh)
-            #     q.put(nh)
-
     # ścieżka do wierzchołka docelowego
     path = []
 
@@ -103,12 +94,12 @@ def bfs(s: int, g: int, graph: dict[int, list[(int, int)]]) -> list[int]:
 
 def ex_1():
     graph = create_graph()
-    path = bfs(1, 8, graph)
+    path = dijkstra(1, 8, graph)
     print(path)
 
-    assert bfs(1, 4, graph) == [1, 3, 4]
-    assert bfs(1, 8, graph) == [1, 3, 4, 6, 5, 8]
-    assert bfs(3, 5, graph) == [3, 4, 6, 5]
+    assert dijkstra(1, 4, graph) == [1, 3, 4]
+    assert dijkstra(1, 8, graph) == [1, 3, 4, 6, 5, 8]
+    assert dijkstra(3, 5, graph) == [3, 4, 6, 5]
 
 
 if __name__ == '__main__':
