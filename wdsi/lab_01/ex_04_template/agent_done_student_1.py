@@ -44,6 +44,7 @@ class Agent:
 
             if cur_n in visited:
                 continue
+            visited.add(cur_n)
 
             if cur_n == self.goal:
                 break

@@ -4,6 +4,7 @@ import queue
 import math
 import heapq
 
+
 class Agent:
     def __init__(self, size, walls, graph, loc, dir, goal):
         self.size = size
@@ -18,7 +19,7 @@ class Agent:
         self.goal = goal
 
         self.path = self.find_path()
-    
+
     def euclidean_distance(self, point1, point2):
         x1, y1 = point1
         x2, y2 = point2
@@ -51,6 +52,8 @@ class Agent:
             if current_node == self.goal:
                 break
 
+            # visited not updated
+
             for neighbor in self.graph[current_node]:
                 distance = current_distance + self.euclidean_distance(current_node, neighbor)
 
@@ -64,6 +67,7 @@ class Agent:
         while current is not None:
             path.append(current)
             current = previous_nodes[current]
+        # path.append(self.loc)
         path = path[::-1] 
 
         return path if path[0] == self.loc else []
