@@ -18,15 +18,15 @@ class LocWorldEnv:
         self.finished = False
 
     def reset(self):
-        self.agentLoc = self.start_loc
-        self.agentDir = 'N'
+        self.agent_loc = self.start_loc
+        self.agent_dir = 'N'
 
     def do_action(self, action):
         points = -1
 
         # only actions that comply with graph
-        if action in self.graph[self.agentLoc]:
-            self.agentLoc = action
+        if action in self.graph[self.agent_loc]:
+            self.agent_loc = action
 
         return points  # cost/benefit of action
 
@@ -102,8 +102,8 @@ class LocView:
 
         if self.agt:
             self.agt.undraw()
-        if state.agentLoc:
-            self.agt = self.draw_arrow(state.agentLoc, state.agentDir, 5, self.color)
+        if state.agent_loc:
+            self.agt = self.draw_arrow(state.agent_loc, state.agent_dir, 5, self.color)
 
     def draw_dot(self, loc, color='blue'):
         x, y = loc

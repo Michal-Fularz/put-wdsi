@@ -18,7 +18,6 @@ class Agent:
         self.dir = dir
         self.goal = goal
 
-        self.t = 0
         self.path = self.find_path()
 
     def __call__(self):

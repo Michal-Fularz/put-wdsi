@@ -12,7 +12,7 @@ class LocWorldEnv:
         self.locations = {*generate_locations(self.size)}.difference(self.walls)
         self.start_loc = start_loc
         self.goal_loc = goal_loc
-        self.lifes = 3
+        self.lives = 3
         self.reset()
         self.finished = False
 
@@ -136,9 +136,6 @@ class LocView:
 
     def pause(self):
         self.win.getMouse()
-
-    # def setTimeColor(self, c):
-    #     self.time.setTextColor(c)
 
     def close(self):
         self.win.close()

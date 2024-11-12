@@ -74,9 +74,9 @@ def main():
     view = LocView(env)
 
     # create the agent
-    agent = Agent(env.size, env.walls, env.graph, env.agentLoc, env.agentDir, goal)
+    agent = Agent(env.size, env.walls, env.graph, env.agent_loc, env.agent_dir, goal)
     t = 0
-    while env.agentLoc != goal:
+    while env.agent_loc != goal:
         print('step %d' % t)
 
         # get agent's path
