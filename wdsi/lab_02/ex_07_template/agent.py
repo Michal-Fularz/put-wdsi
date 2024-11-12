@@ -41,16 +41,50 @@ class Agent:
 
         # use information about requested action to update posterior
         # TODO PUT YOUR CODE HERE
+        self.loc = (loc, 16)
+        self.predict_posterior(action)
 
 
         # ------------------
 
         return action
 
+    # Jak będzie wyglądał rozkład  P(Xt|Xt−1,ut) ? Uzupełnij funkcję predict_posterior(self, action), aby dokonywała
+    # predykcji na podstawie otrzymanej wartości action, oznaczającej komendę, która powinna zostać wykonana
+    # (ale niekoniecznie wykonaną ze względu na niedoskonałość układu napędowego), oraz uwzględniając model niepewności.
+
     def predict_posterior(self, action):
         # predict posterior using requested action
         # TODO PUT YOUR CODE HERE
 
+        print(f'{self.loc=}')
+        print(f'{action=}')
+
+        # 1−6∗ϵm , że poruszy się prawidłowo (action),
+        # 2ϵm , że poruszy się o jedną komórkę za mało (action - 1),
+        # 2ϵm , że poruszy się o jedną komórkę za dużo (action + 1),
+        # ϵm , że poruszy się o dwie komórki za mało (action - 2),
+        # ϵm , że poruszy się o dwie komórki za dużo (action + 2).
+        loc = self.loc[0]
+        self.P_previous = self.P.copy()
+        self.P = np.zeros(self.size, dtype=float)
+        for i in range(0, self.size):
+            if self.P_previous[i] != 0:
+                p = self.P_previous[i]
+                if 0 <= (i + action - 2) < self.size:
+                    self.P[i + action - 2] += p * 1 * self.eps_move
+                if 0 <= (i + action - 1) < self.size:
+                    self.P[i + action - 1] += p * 2 * self.eps_move
+                if 0 <= (i + action) < self.size:
+                    self.P[i + action] += p * (1 - 6 * self.eps_move)
+                if 0 <= (i + action + 1) < self.size:
+                    self.P[i + action + 1] += p * 2 * self.eps_move
+                if 0 <= (i + action + 2) < self.size:
+                    self.P[i + action + 2] += p * 1 * self.eps_move
+
+        print(np.argmax(self.P))
+
+        # bel¯¯¯¯¯¯(xt)=P(xt|z1:t−1,u1:t)=∑xt−1P(xt|xt−1,ut)bel(xt−1)
 
         # ------------------
 
@@ -59,6 +93,12 @@ class Agent:
     def correct_posterior(self, percept):
         # TODO PUT YOUR CODE HERE
         # correct posterior using measurements
+
+        # 1−6∗ϵp , że pomiar będzie prawidłowy (percept),
+        # 2ϵp , że pomiar wskaże jedną komórkę za mało (percept - 1),
+        # 2ϵp , że pomiar wskaże jedną komórkę za dużo (percept + 1),
+        # ϵp , że pomiar wskaże dwie komórki za mało (percept - 2),
+        # ϵp , że pomiar wskaże dwie komórki za dużo (percept + 2).
 
 
         # ------------------
