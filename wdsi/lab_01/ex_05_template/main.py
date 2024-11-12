@@ -48,6 +48,8 @@ def main():
     start_goal = random.sample(locs, k=2)
     start = start_goal[0]
     goal = start_goal[1]
+    start = (6, 9)
+    goal = (6, 7)
 
     # create the environment and viewer
     env = LocWorldEnv(env_size, walls, start, goal)
