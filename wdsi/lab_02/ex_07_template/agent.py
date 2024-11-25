@@ -41,9 +41,8 @@ class Agent:
 
         # use information about requested action to update posterior
         # TODO PUT YOUR CODE HERE
-        self.loc = (loc, 16)
+        # self.loc = (loc, 16)
         self.predict_posterior(action)
-
 
         # ------------------
 
@@ -54,11 +53,48 @@ class Agent:
     # (ale niekoniecznie wykonaną ze względu na niedoskonałość układu napędowego), oraz uwzględniając model niepewności.
 
     def predict_posterior(self, action):
+
+        # 1−6∗ϵm , że poruszy się prawidłowo (action),
+        # 2ϵm , że poruszy się o jedną komórkę za mało (action - 1),
+        # 2ϵm , że poruszy się o jedną komórkę za dużo (action + 1),
+        # ϵm , że poruszy się o dwie komórki za mało (action - 2),
+        # ϵm , że poruszy się o dwie komórki za dużo (action + 2).
+
         # predict posterior using requested action
         # TODO PUT YOUR CODE HERE
 
-        print(f'{self.loc=}')
-        print(f'{action=}')
+        P_prev = self.P.copy()
+        for cur_loc in range(self.size):
+            P_cur = 0.0
+            for prev_loc in range(self.size):
+                P_trans = 0.0
+                diffs = [-2, -1, 0, 1, 2]
+                probs = [
+                    self.eps_move,
+                    2 * self.eps_move,
+                    1.0 - 6 * self.eps_move,
+                    2 * self.eps_move,
+                    self.eps_move,
+                ]
+                for i, cur_diff in enumerate(diffs):
+                    if (
+                        min(max(prev_loc + action + cur_diff, 0), self.size - 1)
+                        == cur_loc
+                    ):
+                        P_trans += probs[i]
+                P_cur += P_trans * P_prev[prev_loc]
+            self.P[cur_loc] = P_cur
+
+        # ------------------
+
+        return
+
+    def predict_posterior_my(self, action):
+        # predict posterior using requested action
+        # TODO PUT YOUR CODE HERE
+
+        print(f"{self.loc=}")
+        print(f"{action=}")
 
         # 1−6∗ϵm , że poruszy się prawidłowo (action),
         # 2ϵm , że poruszy się o jedną komórkę za mało (action - 1),
@@ -100,6 +136,16 @@ class Agent:
         # ϵp , że pomiar wskaże dwie komórki za mało (percept - 2),
         # ϵp , że pomiar wskaże dwie komórki za dużo (percept + 2).
 
+        P_cur = np.zeros_like(self.P)
+
+        P_cur[percept] += 1.0 - 6 * self.eps_perc
+        P_cur[max(percept - 1, 0)] += 2 * self.eps_perc
+        P_cur[max(percept - 2, 0)] += self.eps_perc
+        P_cur[min(percept + 1, self.size - 1)] += 2 * self.eps_perc
+        P_cur[min(percept + 2, self.size - 1)] += self.eps_perc
+
+        self.P = P_cur * self.P
+        self.P /= np.sum(self.P)
 
         # ------------------
         return
