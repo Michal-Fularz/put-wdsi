@@ -9,10 +9,6 @@ class Agent:
         self.size = size
         self.sigma_sq_move = sigma_move ** 2
         self.sigma_sq_perc = sigma_perc ** 2
-        # list of valid locations
-        self.locations = [loc for loc in range(size)]
-        # dictionary from location to its index in the list
-        self.loc_to_idx = {loc: idx for idx, loc in enumerate(self.locations)}
         self.action_dir = -1
 
         self.t = 0
@@ -31,6 +27,7 @@ class Agent:
         # use information about requested action to update posterior
         # TODO PUT YOUR CODE HERE
 
+        self.predict_posterior(action)
  
         # ------------------
 
@@ -42,6 +39,8 @@ class Agent:
         # predict posterior using requested action
         # TODO PUT YOUR CODE HERE
 
+        self.mu = (self.mu + action) % self.size
+        self.sigma_sq += self.sigma_sq_move
 
         # ------------------
 
@@ -51,9 +50,11 @@ class Agent:
         # correct posterior using measurements
         # TODO PUT YOUR CODE HERE
 
-
-        pass
+        self.mu = ((self.sigma_sq * self.mu + self.sigma_sq_perc * percept) / (self.sigma_sq + self.sigma_sq_perc)) % self.size
+        self.sigma_sq = 1 / (1.0 / self.sigma_sq + 1.0 / self.sigma_sq_perc)
         # ------------------
+
+        return
 
     def get_posterior(self):
         return self.mu, math.sqrt(self.sigma_sq)
