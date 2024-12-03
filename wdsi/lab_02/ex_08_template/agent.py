@@ -1,11 +1,4 @@
-# prob.py
-
-import random
 import numpy as np
-import queue
-import math
-
-from gridutil import generate_locations
 
 
 class Agent:
