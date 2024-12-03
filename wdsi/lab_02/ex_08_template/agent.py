@@ -35,6 +35,7 @@ class Agent:
         # use information about requested action to update posterior
         # TODO PUT YOUR CODE HERE
 
+        self.predict_posterior(action)
 
         # ------------------
 
@@ -46,6 +47,19 @@ class Agent:
         # predict posterior using requested action
         # TODO PUT YOUR CODE HERE
 
+        P_prev = self.P.copy()
+        for cur_loc in range(self.size):
+            P_cur = 0.0
+            for prev_loc in range(self.size):
+                P_trans = 0.0
+                diffs = [-2, -1, 0, 1, 2]
+                probs = [self.eps_move, 2 * self.eps_move, 1.0 - 6 * self.eps_move, 2 * self.eps_move, self.eps_move]
+                for i, cur_diff in enumerate(diffs):
+                    if (prev_loc + action + cur_diff) % self.size == cur_loc:
+                        P_trans += probs[i]
+                P_cur += P_trans * P_prev[prev_loc]
+            self.P[cur_loc] = P_cur
+
 
         # ------------------
 
@@ -54,6 +68,23 @@ class Agent:
     def correct_posterior(self, percept):
         # correct posterior using measurements
         # TODO PUT YOUR CODE HERE
+
+        P_cur = np.zeros_like(self.P)
+
+        for i in range(self.size):
+            if percept == True:
+                if i in self.doors:
+                    P_cur[i] = 1.0 - self.eps_perc_true
+                else:
+                    P_cur[i] = self.eps_perc_false
+            elif percept == False:
+                if i in self.doors:
+                    P_cur[i] = self.eps_perc_true
+                else:
+                    P_cur[i] = 1.0 - self.eps_perc_false
+
+        self.P = P_cur * self.P
+        self.P /= np.sum(self.P)
 
 
         # ------------------
