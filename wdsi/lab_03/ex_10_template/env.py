@@ -1,5 +1,5 @@
 from graphics import *
-from gridutil import *
+from gridutil import generate_locations
 
 import random
 import math
@@ -13,37 +13,37 @@ class LocWorldEnv:
         self.size = size
         self.walls = walls
         self.action_sensors = []
-        self.locations = {*locations(self.size)}.difference(self.walls)
+        self.locations = {*generate_locations(self.size)}.difference(self.walls)
         self.start_loc = start_loc
         self.sigma_move = sigma_move
         self.sigma_perc = sigma_perc
         self.dt = dt
-        self.lifes = 3
+        self.lives = 3
         self.reset()
         self.finished = False
 
     def reset(self):
-        self.agentLoc = self.start_loc
-        self.agentVel = 1
-        self.agentDir = 'N'
+        self.agent_loc = self.start_loc
+        self.agent_vel = 1
+        self.agent_dir = 'N'
 
-    def getPercept(self):
-        percept = self.agentLoc[0] + random.gauss(0.0, self.sigma_perc)
+    def get_percept(self):
+        percept = self.agent_loc[0] + random.gauss(0.0, self.sigma_perc)
 
         return percept
 
-    def doAction(self):
+    def do_action(self):
         points = -1
 
-        if (self.agentLoc[0] > self.size - 2 and self.agentVel > 0) or \
-            (self.agentLoc[0] < 2 and self.agentVel < 0):
-            self.agentVel *= -1
+        if (self.agent_loc[0] > self.size - 2 and self.agent_vel > 0) or \
+            (self.agent_loc[0] < 2 and self.agent_vel < 0):
+            self.agent_vel *= -1
 
-        self.agentVel += random.gauss(0.0, self.sigma_move)
-        action = self.agentVel * self.dt
+        self.agent_vel += random.gauss(0.0, self.sigma_move)
+        action = self.agent_vel * self.dt
 
-        print('velocity %.3f' % self.agentVel)
-        self.agentLoc = ((self.agentLoc[0] + action) % self.size, self.agentLoc[1])
+        print('velocity %.3f' % self.agent_vel)
+        self.agent_loc = ((self.agent_loc[0] + action) % self.size, self.agent_loc[1])
 
         return points  # cost/benefit of action
 
@@ -59,13 +59,13 @@ class LocView:
     color = "black"
 
     def __init__(self, state, height=800, title="Loc World"):
-        xySize = state.size
+        xy_size = state.size
         win = self.win = GraphWin(title, 1.33 * height, height, autoflush=False)
         win.setBackground("gray99")
-        win.setCoords(-.5, -.5, 1.33 * xySize - .5, xySize - .5)
+        win.setCoords(-.5, -.5, 1.33 * xy_size - .5, xy_size - .5)
         cells = self.cells = {}
-        for x in range(xySize):
-            for y in range(xySize):
+        for x in range(xy_size):
+            for y in range(xy_size):
                 cells[(x, y)] = Rectangle(Point(x - .5, y - .5), Point(x + .5, y + .5))
                 cells[(x, y)].setWidth(0)
                 cells[(x, y)].draw(win)
@@ -73,28 +73,22 @@ class LocView:
         self.arrow = None
         self.prob_prims = []
         self.chart_prims = []
-        ccenter = 1.167 * (xySize - .5)
-        # self.time = Text(Point(ccenter, (xySize - 1) * .75), "Time").draw(win)
-        # self.time.setSize(36)
-        # self.setTimeColor("black")
+        center = 1.167 * (xy_size - .5)
 
-        self.agentName = Text(Point(ccenter, (xySize - 1) * .5), "").draw(win)
+        self.agentName = Text(Point(center, (xy_size - 1) * .5), "").draw(win)
         self.agentName.setSize(20)
         self.agentName.setFill("Orange")
 
-        self.info = Text(Point(ccenter, (xySize - 1) * .25), "").draw(win)
+        self.info = Text(Point(center, (xy_size - 1) * .25), "").draw(win)
         self.info.setSize(20)
         self.info.setFace("courier")
 
         self.update(state)
 
-    def setAgent(self, name):
+    def set_agent(self, name):
         self.agentName.setText(name)
 
-    # def setTime(self, seconds):
-    #     self.time.setText(str(seconds))
-
-    def setInfo(self, info):
+    def set_info(self, info):
         self.info.setText(info)
 
     def update(self, state, x=None, P=None):
@@ -142,7 +136,7 @@ class LocView:
                 # let's rotate the ellipse to some angle phi
                 r_ellipse = np.stack([ellipse_x_r, ellipse_y_r]).transpose() @ R
 
-                offset = state.agentLoc[1]
+                offset = state.agent_loc[1]
                 points = []
                 for pt in r_ellipse:
                     points.append(Point(X0 + pt[0], Y0 + pt[1] + offset))
@@ -158,22 +152,22 @@ class LocView:
                 prim.undraw()
             self.chart_prims = []
             for y in np.arange(-2.0, 3.0, 1.0):
-                self.chart_prims.append(self.drawLine((0.0, offset + y),
-                                                     (state.size, offset + y),
-                                                     color="black",
-                                                     width=1))
-                self.chart_prims.append(self.drawText((state.size + 1, offset + y), str(y), color="black"))
-            self.chart_prims.append(self.drawLine((0.0, state.agentLoc[1] + state.agentVel),
-                                                  (state.size, state.agentLoc[1] + state.agentVel),
-                                                  color="red",
-                                                  width=1))
+                self.chart_prims.append(self.draw_line((0.0, offset + y),
+                                                       (state.size, offset + y),
+                                                       color="black",
+                                                       width=1))
+                self.chart_prims.append(self.draw_text((state.size + 1, offset + y), str(y), color="black"))
+            self.chart_prims.append(self.draw_line((0.0, state.agent_loc[1] + state.agent_vel),
+                                                   (state.size, state.agent_loc[1] + state.agent_vel),
+                                                   color="red",
+                                                   width=1))
 
         if self.agt:
             self.agt.undraw()
-        if state.agentLoc:
-            self.agt = self.drawArrow(state.agentLoc, state.agentDir, 5, self.color)
+        if state.agent_loc:
+            self.agt = self.draw_arrow(state.agent_loc, state.agent_dir, 5, self.color)
 
-    def drawRect(self, loc, height, color="blue"):
+    def draw_rect(self, loc, height, color="blue"):
         x, y = loc
         a = Rectangle(Point(x - .5, y - .5), Point(x + .5, y - .5 + 4 * height))
         a.setWidth(0)
@@ -181,7 +175,7 @@ class LocView:
         a.draw(self.win)
         return a
 
-    def drawDot(self, loc, color="blue"):
+    def draw_dot(self, loc, color="blue"):
         x, y = loc
         a = Circle(Point(x, y), .1)
         a.setWidth(1)
@@ -189,15 +183,14 @@ class LocView:
         a.draw(self.win)
         return a
 
-    def drawText(self, loc, text, color="blue"):
+    def draw_text(self, loc, text, color="blue"):
         x, y = loc
         a = Text(Point(x, y), text)
-        # a.setWidth(1)
         a.setFill(color)
         a.draw(self.win)
         return a
 
-    def drawLine(self, loc1, loc2, color="blue", width=2):
+    def draw_line(self, loc1, loc2, color="blue", width=2):
         x1, y1 = loc1
         x2, y2 = loc2
         p1 = Point(x1, y1)
@@ -208,7 +201,7 @@ class LocView:
         a.draw(self.win)
         return a
 
-    def drawArrow(self, loc, heading, width, color):
+    def draw_arrow(self, loc, heading, width, color):
         x, y = loc
         dx0, dy0, dx1, dy1 = self.Points[heading]
         p1 = Point(x + dx0, y + dy0)
@@ -222,9 +215,6 @@ class LocView:
 
     def pause(self):
         self.win.getMouse()
-
-    # def setTimeColor(self, c):
-    #     self.time.setTextColor(c)
 
     def close(self):
         self.win.close()

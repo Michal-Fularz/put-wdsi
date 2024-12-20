@@ -6,9 +6,9 @@ import random
 import numpy as np
 
 from graphics import *
-from gridutil import *
-from agent import *
-from env import *
+from gridutil import generate_locations
+from agent import Agent
+from env import LocWorldEnv, LocView
 
 
 def main():
@@ -31,7 +31,7 @@ def main():
                 walls.append((j, env_size - i - 1))
 
     # list of valid locations
-    locs = list({*locations(env_size)}.difference(walls))
+    locs = list({*generate_locations(env_size)}.difference(walls))
     # start location
     start = (0.0, float(env_size // 2))
     # time step
@@ -42,7 +42,7 @@ def main():
     view = LocView(env)
 
     # create the agent
-    agent = Agent(env.size, env.walls, env.agentLoc, env.agentDir, sigma_move, sigma_perc, dt)
+    agent = Agent(env.size, env.walls, env.agent_loc, env.agent_dir, sigma_move, sigma_perc, dt)
 
     t = 0.0
     print('initial state')
@@ -59,7 +59,7 @@ def main():
         print('performing action')
         # get agent's action and execute it
         agent()
-        env.doAction()
+        env.do_action()
 
         mu, Sigma = agent.get_posterior()
         view.update(env, mu, Sigma)
@@ -68,9 +68,9 @@ def main():
         view.pause()
 
         print('performing perception')
-        percept = env.getPercept()
+        percept = env.get_percept()
         print('percept: %.3f' % percept)
-        print('true loc: %.3f' % env.agentLoc[0])
+        print('true loc: %.3f' % env.agent_loc[0])
         agent.correct_posterior(percept)
 
         mu, Sigma = agent.get_posterior()
@@ -78,7 +78,7 @@ def main():
         update(0.5 / dt)
 
         # compute error as square root of expected value of squared differences
-        diff = np.abs(env.agentLoc[0] - mu[0])
+        diff = np.abs(env.agent_loc[0] - mu[0])
         # take into account that the world is circular
         diff = np.minimum(diff, env.size - diff)
         cur_error = diff
