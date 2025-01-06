@@ -1,1 +1,8 @@
 numpy
+
+# automl
+tpot
+lightautoml
+autogluon
+h2o
+bluecast
