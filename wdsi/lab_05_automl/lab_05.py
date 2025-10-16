@@ -1,17 +1,36 @@
-from tpot import TPOTClassifier
 from sklearn.datasets import load_digits, load_iris, load_wine, load_diabetes, load_breast_cancer
 from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
 
 import pandas as pd
-from lightautoml.automl.presets.tabular_presets import TabularAutoML
-from lightautoml.tasks import Task
 
-from autogluon.tabular import TabularPredictor
+# from autogluon.tabular import TabularPredictor
+#
+# from tpot import TPOTClassifier
+#
+# from bluecast.blueprints.cast import BlueCast
+#
+# from lightautoml.automl.presets.tabular_presets import TabularAutoML
+# from lightautoml.tasks import Task
+#
+# import h2o
+# from h2o.automl import H2OAutoML
 
-import h2o
-from h2o.automl import H2OAutoML
 
-from bluecast.blueprints.cast import BlueCast
+def sklearn():
+    dataset = load_iris()
+    X_train, X_test, y_train, y_test = train_test_split(
+        dataset.data, dataset.target, random_state=42, test_size=0.2#, stratify=dataset.target
+    )
+    print(y_test)
+
+    model = RandomForestClassifier(random_state=42)
+    model.fit(X_train, y_train)
+
+    y_pred = model.predict(X_test)
+    acc = accuracy_score(y_test, y_pred)
+    print(f'{acc=}')
 
 
 def tpot_iris():
@@ -74,13 +93,13 @@ def lightautoml_iris():
     return automl, predictions_df
 
 
-def autogluon_wine():
+def autogluon():
     dataset = load_iris()
     X = pd.DataFrame(dataset.data, columns=dataset.feature_names)
     y = dataset.target
 
     # Split the data into training and testing sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42, stratify=y)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     # Combine training features and target into a single DataFrame for AutoGluon
     train_data = X_train.copy()
@@ -215,10 +234,11 @@ def bluecast_iris():
 
 
 if __name__ == "__main__":
+    sklearn()
+    autogluon()
     # tpot_iris()
     # tpot_digits()
     # lightautoml_iris()
-    # autogluon_wine()
     # h2o_iris()
     # bluecast_hello_world()
-    bluecast_iris()
+    # bluecast_iris()
