@@ -18,6 +18,8 @@ class Agent:
         self.dir = dir
         self.goal = goal
 
+        print("Agent initialized at location:", self.loc, "with goal:", self.goal)
+
         self.path = self.find_path()
 
     def __call__(self):
