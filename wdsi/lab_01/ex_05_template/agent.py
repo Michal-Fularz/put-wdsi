@@ -1,7 +1,9 @@
-import random
-import queue
+# prob.py
+# This is
 
+import random
 import numpy as np
+import queue
 
 from gridutil import generate_locations
 
@@ -13,12 +15,13 @@ class Agent:
         # list of valid locations
         self.locations = list({*generate_locations(self.size)}.difference(self.walls))
         # dictionary from location to its index in the list
-        self.loc_to_idx = {l: idx for idx, l in enumerate(self.locations)}
+        self.loc_to_idx = {loc: idx for idx, loc in enumerate(self.locations)}
         self.loc = loc
         self.dir = dir
         self.goal = goal
 
-        self.path = self.find_path()
+        self.t = 0
+        self.path, self.actions = self.find_path()
 
     def __call__(self):
         action = 'N'
@@ -34,15 +37,16 @@ class Agent:
 
     def find_path(self):
         path = []
+        actions = []
 
         # find path from sel.loc to self.goal
         # TODO PUT YOUR CODE HERE
 
-
+        
 
         # ------------------
 
-        return path
+        return path, actions
 
     def get_path(self):
         return self.path

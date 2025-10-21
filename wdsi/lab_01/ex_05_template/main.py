@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+
+"""code template"""
+
 import random
 import numpy as np
 
@@ -41,7 +45,9 @@ def main():
     # list of valid locations
     locs = list({*generate_locations(env_size)}.difference(walls))
     # start and goal location
-    start, goal = random.sample(locs, k=2)
+    start_goal = random.sample(locs, k=2)
+    start = start_goal[0]
+    goal = start_goal[1]
 
     # create the environment and viewer
     env = LocWorldEnv(env_size, walls, start, goal)
@@ -49,9 +55,9 @@ def main():
 
     # create the agent
     agent = Agent(env.size, env.walls, env.agent_loc, env.agent_dir, goal)
-    t = 0
+    t = 0.0
     while env.agent_loc != goal:
-        print('step %d' % t)
+        print('elapsed time %f' % -t)
 
         # get agent's path
         path = agent.get_path()
@@ -65,9 +71,9 @@ def main():
         # uncomment to pause before action
         view.pause()
 
-        env.do_action(action)
+        action_cost = env.do_action(action)
 
-        t += 1
+        t += action_cost
 
     # pause until mouse clicked
     view.pause()

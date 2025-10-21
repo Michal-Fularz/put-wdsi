@@ -1,19 +1,18 @@
 import random
-import queue
-
 import numpy as np
-
-from gridutil import generate_locations
+import queue
+import math
 
 
 class Agent:
-    def __init__(self, size, walls, loc, dir, goal):
+    def __init__(self, size, walls, graph, loc, dir, goal):
         self.size = size
         self.walls = walls
+        self.graph = graph
         # list of valid locations
-        self.locations = list({*generate_locations(self.size)}.difference(self.walls))
+        self.locations = list(self.graph.keys())
         # dictionary from location to its index in the list
-        self.loc_to_idx = {l: idx for idx, l in enumerate(self.locations)}
+        self.loc_to_idx = {loc: idx for idx, loc in enumerate(self.locations)}
         self.loc = loc
         self.dir = dir
         self.goal = goal
@@ -21,7 +20,7 @@ class Agent:
         self.path = self.find_path()
 
     def __call__(self):
-        action = 'N'
+        action = self.loc
 
         # select action to reach first location in self.path
         # TODO PUT YOUR CODE HERE
@@ -38,7 +37,7 @@ class Agent:
         # find path from sel.loc to self.goal
         # TODO PUT YOUR CODE HERE
 
-
+        
 
         # ------------------
 
