@@ -22,9 +22,9 @@ class Agent:
 
         # select action to reach first location in self.path
         # TODO PUT YOUR CODE HERE
+        action = get_action_from_to(self.path[self.t], self.path[self.t+1])
 
-
-
+        self.t = self.t + 1
         # ------------------
 
         return action
@@ -59,8 +59,6 @@ class Agent:
                 adjacent_vertices.append(self.loc_to_idx[v])
             graph[self.loc_to_idx[key]] = adjacent_vertices
 
-            # graph[self.loc_to_idx[key]] = [self.loc_to_idx[vertex] for vertex in vertices]
-
         return graph
 
 
@@ -79,3 +77,18 @@ def create_adjacency_list(coords: list[(int, int)]) -> dict[(int, int), list[(in
                     adjacency_list[coord].append(other_coord)
 
     return adjacency_list
+
+
+def get_action_from_to(from_loc: (int, int), to_loc: (int, int)) -> str:
+    action = ''
+
+    if to_loc[0] > from_loc[0]:
+        action = 'E'
+    elif to_loc[0] < from_loc[0]:
+        action = 'W'
+    elif to_loc[1] > from_loc[1]:
+        action = 'N'
+    elif to_loc[1] < from_loc[1]:
+        action = 'S'
+
+    return action

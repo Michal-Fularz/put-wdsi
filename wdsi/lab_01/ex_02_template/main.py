@@ -3,7 +3,7 @@ import numpy as np
 
 from graphics import *
 from gridutil import generate_locations
-from agent import Agent
+from agent_done import Agent
 from env import LocWorldEnv, LocView
 
 
