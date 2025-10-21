@@ -13,7 +13,7 @@ class Agent:
         # list of valid locations
         self.locations = list({*generate_locations(self.size)}.difference(self.walls))
         # dictionary from location to its index in the list
-        self.loc_to_idx = {loc: idx for idx, loc in enumerate(self.locations)}
+        self.loc_to_idx = {l: idx for idx, l in enumerate(self.locations)}
         self.loc = loc
         self.dir = dir
         self.goal = goal
