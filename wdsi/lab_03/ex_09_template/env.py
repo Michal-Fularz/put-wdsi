@@ -1,17 +1,22 @@
 from graphics import *
-from gridutil import generate_locations, next_direction, next_loc
+from gridutil import generate_locations
+
+import random
+import math
+import numpy as np
 
 
 class LocWorldEnv:
-    actions = 'turnleft turnright forward'.split()
+    actions = "turnleft turnright forward".split()
 
-    def __init__(self, size, walls, start_loc, goal_loc):
+    def __init__(self, size, walls, start_loc, sigma_move, sigma_perc):
         self.size = size
         self.walls = walls
         self.action_sensors = []
         self.locations = {*generate_locations(self.size)}.difference(self.walls)
         self.start_loc = start_loc
-        self.goal_loc = goal_loc
+        self.sigma_move = sigma_move
+        self.sigma_perc = sigma_perc
         self.lives = 3
         self.reset()
         self.finished = False
@@ -20,20 +25,18 @@ class LocWorldEnv:
         self.agent_loc = self.start_loc
         self.agent_dir = 'N'
 
-    def do_action(self, action):
-        points = 0
+    def get_percept(self):
+        percept = self.agent_loc[0] + random.gauss(0.0, self.sigma_perc)
 
-        if action == 'turnleft':
-            self.agent_dir = next_direction(self.agent_dir, -1)
-            points = -5
-        elif action == 'turnright':
-            self.agent_dir = next_direction(self.agent_dir, 1)
-            points = -2
-        elif action == 'forward':
-            points = -1
-            loc = next_loc(self.agent_loc, self.agent_dir)
-            if loc in self.locations:
-                self.agent_loc = loc
+        return percept
+
+    def do_action(self, action):
+        points = -1
+
+        action += random.gauss(0.0, self.sigma_move)
+
+        print('executed action %.3f' % action)
+        self.agent_loc = ((self.agent_loc[0] + action) % self.size, self.agent_loc[1])
 
         return points  # cost/benefit of action
 
@@ -42,83 +45,98 @@ class LocView:
     # LocView shows a view of a LocWorldEnv. Just hand it an env, and
     #   a window will pop up.
 
-    Size = .2
+    Size = .5
     Points = {'N': (0, -Size, 0, Size), 'E': (-Size, 0, Size, 0),
               'S': (0, Size, 0, -Size), 'W': (Size, 0, -Size, 0)}
 
-    color = 'black'
+    color = "black"
 
-    def __init__(self, state, height=800, title='Loc World'):
+    def __init__(self, state, height=800, title="Loc World"):
         xy_size = state.size
         win = self.win = GraphWin(title, 1.33 * height, height, autoflush=False)
-        win.setBackground('gray99')
+        win.setBackground("gray99")
         win.setCoords(-.5, -.5, 1.33 * xy_size - .5, xy_size - .5)
         cells = self.cells = {}
         for x in range(xy_size):
             for y in range(xy_size):
                 cells[(x, y)] = Rectangle(Point(x - .5, y - .5), Point(x + .5, y + .5))
-                cells[(x, y)].setWidth(2)
+                cells[(x, y)].setWidth(0)
                 cells[(x, y)].draw(win)
         self.agt = None
         self.arrow = None
-        self.path_prim = []
+        self.prob_prim = None
         center = 1.167 * (xy_size - .5)
 
-        self.agentName = Text(Point(center, (xy_size - 1) * .5), '').draw(win)
+        self.agentName = Text(Point(center, (xy_size - 1) * .5), "").draw(win)
         self.agentName.setSize(20)
-        self.agentName.setFill('Orange')
+        self.agentName.setFill("Orange")
 
-        self.info = Text(Point(center, (xy_size - 1) * .25), '').draw(win)
+        self.info = Text(Point(center, (xy_size - 1) * .25), "").draw(win)
         self.info.setSize(20)
-        self.info.setFace('courier')
+        self.info.setFace("courier")
 
-        self.update(state, [])
+        self.update(state)
 
     def set_agent(self, name):
         self.agentName.setText(name)
 
+    # def setTime(self, seconds):
+    #     self.time.setText(str(seconds))
+
     def set_info(self, info):
         self.info.setText(info)
 
-    def update(self, state, path):
+    def update(self, state, mu=None, sigma=None):
         # View state in exiting window
         for loc, cell in self.cells.items():
             if loc in state.walls:
-                cell.setFill('black')
-            elif loc == state.goal_loc:
-                cell.setFill('yellow')
+                cell.setFill("black")
             else:
-                cell.setFill('white')
+                cell.setFill("white")
 
-        for prim in self.path_prim:
-            prim.undraw()
-        self.path_prim = []
-        for i in range(len(path)):
-            self.path_prim.append(self.draw_dot(path[i][0:2]))
-            if i < len(path) - 1:
-                self.path_prim.append(self.draw_line(path[i][0:2], path[i + 1][0:2]))
+        if self.prob_prim is not None:
+            self.prob_prim.undraw()
+        if mu is not None and sigma is not None:
+            offset = state.agent_loc[1] + 2
+            points = [Point(0.0, offset)]
+            for x in np.arange(0.0, state.size, 0.2):
+                y = 1.0 / (sigma * math.sqrt(2 * math.pi)) * math.exp(-(x - mu)**2 / (2 * sigma**2))
+                points.append(Point(x, offset + 4 * y))
+            points.append(Point(state.size, offset))
+            self.prob_prim = Polygon(points)
+            self.prob_prim.setWidth(1)
+            self.prob_prim.setFill("blue")
+            self.prob_prim.draw(self.win)
 
         if self.agt:
             self.agt.undraw()
         if state.agent_loc:
             self.agt = self.draw_arrow(state.agent_loc, state.agent_dir, 5, self.color)
 
-    def draw_dot(self, loc):
+    def draw_rect(self, loc, height, color="blue"):
         x, y = loc
-        a = Circle(Point(x, y), .1)
-        a.setWidth(1)
-        a.setFill('blue')
+        a = Rectangle(Point(x - .5, y - .5), Point(x + .5, y - .5 + 4 * height))
+        a.setWidth(0)
+        a.setFill(color)
         a.draw(self.win)
         return a
 
-    def draw_line(self, loc1, loc2):
+    def draw_dot(self, loc, color="blue"):
+        x, y = loc
+        a = Circle(Point(x, y), .1)
+        a.setWidth(1)
+        a.setFill(color)
+        a.draw(self.win)
+        return a
+
+    def draw_line(self, loc1, loc2, color="blue"):
         x1, y1 = loc1
         x2, y2 = loc2
         p1 = Point(x1, y1)
         p2 = Point(x2, y2)
         a = Line(p1, p2)
         a.setWidth(2)
-        a.setFill('blue')
+        a.setFill(color)
         a.draw(self.win)
         return a
 

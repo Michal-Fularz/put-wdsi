@@ -1,7 +1,3 @@
-#!/usr/bin/env python
-
-"""code template"""
-
 import random
 import numpy as np
 
@@ -45,9 +41,7 @@ def main():
     # list of valid locations
     locs = list({*generate_locations(env_size)}.difference(walls))
     # start and goal location
-    start_goal = random.sample(locs, k=2)
-    start = start_goal[0]
-    goal = start_goal[1]
+    start, goal = random.sample(locs, k=2)
 
     # create the environment and viewer
     env = LocWorldEnv(env_size, walls, start, goal)
