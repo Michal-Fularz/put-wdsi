@@ -6,7 +6,6 @@ import random
 import numpy as np
 
 from graphics import *
-from gridutil import generate_locations
 from agent import Agent
 from env import LocWorldEnv, LocView
 
@@ -19,8 +18,8 @@ def main():
     rate = 1
     # size of the environment
     env_size = 32
-    eps_move = 0.02
-    eps_perc = 0.1
+    sigma_move = 0.5
+    sigma_perc = 1.0
     # map of the environment: 1 - wall, 0 - free
     map = np.zeros((env_size, env_size))
     # build the list of walls locations
@@ -30,17 +29,17 @@ def main():
             if map[i, j] == 1:
                 walls.append((j, env_size - i - 1))
 
-    # list of valid locations
-    locs = list({*generate_locations(env_size)}.difference(walls))
-    # start and goal location
-    start = (0, env_size // 2)
+    # start location
+    start = (0.0, float(env_size // 2))
 
     # create the environment and viewer
-    env = LocWorldEnv(env_size, walls, start, eps_move, eps_perc)
+    env = LocWorldEnv(env_size, walls, start, sigma_move, sigma_perc)
     view = LocView(env)
 
     # create the agent
-    agent = Agent(env.size, env.walls, env.agent_loc, env.agent_dir, eps_move, eps_perc)
+    agent = Agent(env.size, sigma_move, sigma_perc)
+    # list of errors
+    errors = []
     t = 0
     while t != 40:
         print('\nstep %d' % t)
@@ -48,24 +47,35 @@ def main():
         print('performing action')
         # get agent's action and execute it
         action = agent()
-        print('action: ', action)
+        print('action: %.3f' % action)
         env.do_action(action)
 
-        P = agent.get_posterior()
-        view.update(env, P)
+        mu, sigma = agent.get_posterior()
+        view.update(env, mu, sigma)
         update(rate)
         # uncomment to pause before action
         view.pause()
 
         print('performing perception')
         percept = env.get_percept()
-        print('percept: ', percept)
-        print('true loc: %d' % env.agent_loc[0])
+        print('percept: %.3f' % percept)
+        print('true loc: %.3f' % env.agent_loc[0])
         agent.correct_posterior(percept)
 
-        P = agent.get_posterior()
-        view.update(env, P)
+        mu, sigma = agent.get_posterior()
+        view.update(env, mu, sigma)
         update(rate)
+
+        # compute error as square root of expected value of squared differences
+        diff = np.abs(env.agent_loc[0] - mu)
+        # take into account that the world is circular
+        diff = np.minimum(diff, env.size - diff)
+        cur_error = diff
+        print('current error: %.3f' % cur_error)
+
+        errors.append(cur_error)
+        print('mean error: %.3f' % np.array(errors).mean())
+
         # uncomment to pause before action
         view.pause()
 
