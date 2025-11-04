@@ -14,6 +14,7 @@ from env import LocWorldEnv, LocView
 def main():
     # comment to get different scenarios
     random.seed(13)
+    np.random.seed(13)
     # rate of executing actions
     rate = 1
     # size of the environment
