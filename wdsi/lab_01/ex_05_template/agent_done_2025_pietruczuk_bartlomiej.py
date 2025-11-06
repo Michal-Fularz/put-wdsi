@@ -52,6 +52,7 @@ class Agent:
                 cost[(x,y)] = float('inf')
         cost[self.loc] = 0
         pq = [(0, self.loc,self.dir)]
+        # wrong directions - y goes from left to right, so y should be changed
         directions = [ [1, 0],[0, -1],[-1, 0],[0, 1]]
         direction_names = ["N","E","S","W"]
         while pq:
