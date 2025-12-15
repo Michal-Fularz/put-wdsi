@@ -1,5 +1,5 @@
 from graphics import *
-from gridutil import *
+from gridutil import generate_locations
 
 import random
 import math
@@ -13,30 +13,30 @@ class LocWorldEnv:
         self.size = size
         self.walls = walls
         self.action_sensors = []
-        self.locations = {*locations(self.size)}.difference(self.walls)
+        self.locations = {*generate_locations(self.size)}.difference(self.walls)
         self.start_loc = start_loc
         self.sigma_move = sigma_move
         self.sigma_perc = sigma_perc
-        self.lifes = 3
+        self.lives = 3
         self.reset()
         self.finished = False
 
     def reset(self):
-        self.agentLoc = self.start_loc
-        self.agentDir = 'N'
+        self.agent_loc = self.start_loc
+        self.agent_dir = 'N'
 
-    def getPercept(self):
-        percept = self.agentLoc[0] + random.gauss(0.0, self.sigma_perc)
+    def get_percept(self):
+        percept = self.agent_loc[0] + random.gauss(0.0, self.sigma_perc)
 
         return percept
 
-    def doAction(self, action):
+    def do_action(self, action):
         points = -1
 
         action += random.gauss(0.0, self.sigma_move)
 
         print('executed action %.3f' % action)
-        self.agentLoc = ((self.agentLoc[0] + action) % self.size, self.agentLoc[1])
+        self.agent_loc = ((self.agent_loc[0] + action) % self.size, self.agent_loc[1])
 
         return points  # cost/benefit of action
 
@@ -52,44 +52,41 @@ class LocView:
     color = "black"
 
     def __init__(self, state, height=800, title="Loc World"):
-        xySize = state.size
+        xy_size = state.size
         win = self.win = GraphWin(title, 1.33 * height, height, autoflush=False)
         win.setBackground("gray99")
-        win.setCoords(-.5, -.5, 1.33 * xySize - .5, xySize - .5)
+        win.setCoords(-.5, -.5, 1.33 * xy_size - .5, xy_size - .5)
         cells = self.cells = {}
-        for x in range(xySize):
-            for y in range(xySize):
+        for x in range(xy_size):
+            for y in range(xy_size):
                 cells[(x, y)] = Rectangle(Point(x - .5, y - .5), Point(x + .5, y + .5))
                 cells[(x, y)].setWidth(0)
                 cells[(x, y)].draw(win)
         self.agt = None
         self.arrow = None
-        self.prob_prims = []
-        ccenter = 1.167 * (xySize - .5)
-        # self.time = Text(Point(ccenter, (xySize - 1) * .75), "Time").draw(win)
-        # self.time.setSize(36)
-        # self.setTimeColor("black")
+        self.prob_prim = None
+        center = 1.167 * (xy_size - .5)
 
-        self.agentName = Text(Point(ccenter, (xySize - 1) * .5), "").draw(win)
+        self.agentName = Text(Point(center, (xy_size - 1) * .5), "").draw(win)
         self.agentName.setSize(20)
         self.agentName.setFill("Orange")
 
-        self.info = Text(Point(ccenter, (xySize - 1) * .25), "").draw(win)
+        self.info = Text(Point(center, (xy_size - 1) * .25), "").draw(win)
         self.info.setSize(20)
         self.info.setFace("courier")
 
         self.update(state)
 
-    def setAgent(self, name):
+    def set_agent(self, name):
         self.agentName.setText(name)
 
     # def setTime(self, seconds):
     #     self.time.setText(str(seconds))
 
-    def setInfo(self, info):
+    def set_info(self, info):
         self.info.setText(info)
 
-    def update(self, state, p=None, w=None):
+    def update(self, state, mu=None, sigma=None):
         # View state in exiting window
         for loc, cell in self.cells.items():
             if loc in state.walls:
@@ -97,27 +94,26 @@ class LocView:
             else:
                 cell.setFill("white")
 
-        for prim in self.prob_prims:
-            prim.undraw()
-        self.prob_prims = []
-        if w is not None:
-            w = w / np.sum(w)
-            # minimum weight, so it is visible
-            w = np.maximum(w, 0.1 / len(w))
-        if p is not None:
-            offset = state.agentLoc[1] + 2
-            for i in range(len(p)):
-                size = 1.0
-                if w is not None:
-                    size = w[i] * 10.0
-                self.prob_prims.append(self.drawLine((p[i], offset), (p[i], offset + size), 'blue'))
+        if self.prob_prim is not None:
+            self.prob_prim.undraw()
+        if mu is not None and sigma is not None:
+            offset = state.agent_loc[1] + 2
+            points = [Point(0.0, offset)]
+            for x in np.arange(0.0, state.size, 0.2):
+                y = 1.0 / (sigma * math.sqrt(2 * math.pi)) * math.exp(-(x - mu)**2 / (2 * sigma**2))
+                points.append(Point(x, offset + 4 * y))
+            points.append(Point(state.size, offset))
+            self.prob_prim = Polygon(points)
+            self.prob_prim.setWidth(1)
+            self.prob_prim.setFill("blue")
+            self.prob_prim.draw(self.win)
 
         if self.agt:
             self.agt.undraw()
-        if state.agentLoc:
-            self.agt = self.drawArrow(state.agentLoc, state.agentDir, 5, self.color)
+        if state.agent_loc:
+            self.agt = self.draw_arrow(state.agent_loc, state.agent_dir, 5, self.color)
 
-    def drawRect(self, loc, height, color="blue"):
+    def draw_rect(self, loc, height, color="blue"):
         x, y = loc
         a = Rectangle(Point(x - .5, y - .5), Point(x + .5, y - .5 + 4 * height))
         a.setWidth(0)
@@ -125,15 +121,15 @@ class LocView:
         a.draw(self.win)
         return a
 
-    def drawDot(self, loc, color="blue", size=0.1):
+    def draw_dot(self, loc, color="blue"):
         x, y = loc
-        a = Circle(Point(x, y), size)
+        a = Circle(Point(x, y), .1)
         a.setWidth(1)
         a.setFill(color)
         a.draw(self.win)
         return a
 
-    def drawLine(self, loc1, loc2, color="blue"):
+    def draw_line(self, loc1, loc2, color="blue"):
         x1, y1 = loc1
         x2, y2 = loc2
         p1 = Point(x1, y1)
@@ -144,7 +140,7 @@ class LocView:
         a.draw(self.win)
         return a
 
-    def drawArrow(self, loc, heading, width, color):
+    def draw_arrow(self, loc, heading, width, color):
         x, y = loc
         dx0, dy0, dx1, dy1 = self.Points[heading]
         p1 = Point(x + dx0, y + dy0)
@@ -158,9 +154,6 @@ class LocView:
 
     def pause(self):
         self.win.getMouse()
-
-    # def setTimeColor(self, c):
-    #     self.time.setTextColor(c)
 
     def close(self):
         self.win.close()

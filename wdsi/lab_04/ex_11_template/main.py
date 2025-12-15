@@ -1,14 +1,10 @@
-#!/usr/bin/env python
-
-"""code template"""
-
 import random
 import numpy as np
 
 from graphics import *
-from gridutil import *
-from agent import *
-from env import *
+from gridutil import generate_locations
+from agent import Agent
+from env import LocWorldEnv, LocView
 
 
 def main():
@@ -31,7 +27,7 @@ def main():
                 walls.append((j, env_size - i - 1))
 
     # list of valid locations
-    locs = list({*locations(env_size)}.difference(walls))
+    locs = list({*generate_locations(env_size)}.difference(walls))
     # start location
     start = (0.0, float(env_size // 2))
 
@@ -51,12 +47,12 @@ def main():
         # get agent's action and execute it
         action = agent()
         print('action: %.3f' % action)
-        env.doAction(action)
+        env.do_action(action)
 
         print('performing perception')
-        percept = env.getPercept()
+        percept = env.get_percept()
         print('percept: %.3f' % percept)
-        print('true loc: %.3f' % env.agentLoc[0])
+        print('true loc: %.3f' % env.agent_loc[0])
         agent.calculate_weights(percept)
         w = agent.get_weights()
 

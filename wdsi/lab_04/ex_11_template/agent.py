@@ -1,9 +1,5 @@
-import random
 import numpy as np
-import queue
 import math
-
-from gridutil import *
 
 
 class Agent:
