@@ -64,7 +64,7 @@ class LocView:
                 cells[(x, y)].draw(win)
         self.agt = None
         self.arrow = None
-        self.prob_prim = None
+        self.prob_prims = []
         center = 1.167 * (xy_size - .5)
 
         self.agentName = Text(Point(center, (xy_size - 1) * .5), "").draw(win)
@@ -86,7 +86,7 @@ class LocView:
     def set_info(self, info):
         self.info.setText(info)
 
-    def update(self, state, mu=None, sigma=None):
+    def update(self, state, p=None, w=None):
         # View state in exiting window
         for loc, cell in self.cells.items():
             if loc in state.walls:
@@ -94,19 +94,20 @@ class LocView:
             else:
                 cell.setFill("white")
 
-        if self.prob_prim is not None:
-            self.prob_prim.undraw()
-        if mu is not None and sigma is not None:
+        for prim in self.prob_prims:
+            prim.undraw()
+        self.prob_prims = []
+        if w is not None:
+            w = w / np.sum(w)
+            # minimum weight, so it is visible
+            w = np.maximum(w, 0.1 / len(w))
+        if p is not None:
             offset = state.agent_loc[1] + 2
-            points = [Point(0.0, offset)]
-            for x in np.arange(0.0, state.size, 0.2):
-                y = 1.0 / (sigma * math.sqrt(2 * math.pi)) * math.exp(-(x - mu)**2 / (2 * sigma**2))
-                points.append(Point(x, offset + 4 * y))
-            points.append(Point(state.size, offset))
-            self.prob_prim = Polygon(points)
-            self.prob_prim.setWidth(1)
-            self.prob_prim.setFill("blue")
-            self.prob_prim.draw(self.win)
+            for i in range(len(p)):
+                size = 1.0
+                if w is not None:
+                    size = w[i] * 10.0
+                self.prob_prims.append(self.draw_line((p[i], offset), (p[i], offset + size), 'blue'))
 
         if self.agt:
             self.agt.undraw()

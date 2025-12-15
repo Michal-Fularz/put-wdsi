@@ -69,7 +69,7 @@ def main():
         update(rate)
 
         # compute error as square root of expected value of differences
-        diff = np.abs(env.agentLoc[0] - p)
+        diff = np.abs(env.agent_loc[0] - p)
         # take into account that the world is circular
         diff = np.minimum(diff, env.size - diff)
         diff2 = np.square(diff)
