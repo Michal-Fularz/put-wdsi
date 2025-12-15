@@ -19,7 +19,8 @@ class Agent:
         # create an initial particle set as 1-D numpy array (self.p)
         # and initial weights as 1-D numpy array (self.w)
         # TODO PUT YOUR CODE HERE
-
+        self.p = np.random.random(self.n) * self.size
+        self.w = np.ones(self.n, dtype=float) / self.n
         # ------------------
 
     def __call__(self):
@@ -32,7 +33,7 @@ class Agent:
 
         # use information about requested action to update posterior
         # TODO PUT YOUR CODE HERE
-
+        self.predict_posterior(action)
         # ------------------
 
         self.t += 1
@@ -42,7 +43,8 @@ class Agent:
     def predict_posterior(self, action):
         # predict posterior using requested action
         # TODO PUT YOUR CODE HERE
-
+        for i in range(self.n):
+            self.p[i] = (self.p[i] + action + np.random.randn(1) * math.sqrt(self.sigma_sq_move)) % self.size
         # ------------------
 
         # this function does not return anything
@@ -51,7 +53,10 @@ class Agent:
     def calculate_weights(self, percept):
         # calculate weights using percept
         # TODO PUT YOUR CODE HERE
-
+        for i in range(len(self.p)):
+            diff = self.p[i] - percept
+            self.w[i] = math.exp(-0.5 * (diff ** 2) / self.sigma_sq_perc)
+        self.w = self.w / np.sum(self.w)
         # ------------------
 
         # this function does not return anything
@@ -60,7 +65,19 @@ class Agent:
     def correct_posterior(self):
         # correct posterior using measurements
         # TODO PUT YOUR CODE HERE
+        beta = 0.0
+        idx = 0
+        w_max = np.max(self.w)
+        p_new = np.zeros_like(self.p)
+        for i in range(self.n):
+            beta += np.random.random(1) * 2 * w_max
+            while self.w[idx] < beta:
+                beta -= self.w[idx]
+                idx = (idx + 1) % self.n
 
+            p_new[i] = self.p[idx]
+
+        self.p = p_new
         # ------------------
 
         # this function does not return anything
