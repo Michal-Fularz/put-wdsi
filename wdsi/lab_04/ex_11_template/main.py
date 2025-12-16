@@ -37,6 +37,7 @@ def main():
 
     # create the agent
     agent = Agent(env.size, sigma_move, sigma_perc)
+    print(f'{agent.get_particles()=}')
     # list of errors
     errors = []
     t = 0
@@ -57,6 +58,9 @@ def main():
         w = agent.get_weights()
 
         p = agent.get_particles()
+
+        print(f'{p=}')
+
         view.update(env, p, w)
         update(rate)
         # uncomment to pause before action
